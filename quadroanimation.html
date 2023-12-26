@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+    <title>Анимация</title>
+</head>
+<body>
+    <canvas id="demoCanvas" width="600" height="400"></canvas>
+    <button id="startButton">Начать анимацию</button>
+
+    <script>
+        const canvas = document.getElementById("demoCanvas");
+        const ctx = canvas.getContext("2d");
+
+        class JumpingObject {
+            constructor(x, y, size, color, scale = 1) {
+                this.x = x;
+                this.y = y;
+                this.size = size;
+                this.color = color;
+                this.angle = 0;
+                this.scale = scale;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+                ctx.scale(this.scale, this.scale); // Добавление масштабирования
+                ctx.fillStyle = this.color;
+                ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+                ctx.restore();
+            }
+
+            update(time) {
+                this.y = 200 + Math.sin(time / 500) * 100;
+                this.angle += 0.02;
+                this.scale = 1 + Math.sin(time / 1000) * 0.2; // Пример масштабирования
+                const red = Math.sin(time / 1000) * 127 + 128;
+                const green = Math.sin(time / 1500) * 127 + 128;
+                const blue = Math.sin(time / 2000) * 127 + 128;
+                this.color = `rgb(${red.toFixed(0)}, ${green.toFixed(0)}, ${blue.toFixed(0)})`;
+            }
+        }
+
+        const jumpingObject = new JumpingObject(300, 200, 50, "blue");
+        let animationId;
+
+        function startAnimation() {
+            function animate(time) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                jumpingObject.update(time);
+                jumpingObject.draw();
+                animationId = requestAnimationFrame(animate);
+            }
+
+            // Запуск анимации
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function stopAnimation() {
+            // Остановка анимации
+            cancelAnimationFrame(animationId);
+        }
+
+        document.getElementById("startButton").addEventListener("click", startAnimation);
+    </script>
+</body>
+</html>
